@@ -1,4 +1,3 @@
-
 import create from '../../utils/create'
 
 // components/hello/hello.js
@@ -14,12 +13,12 @@ create({
    * 组件的初始数据
    */
   data: {
-    abc : '',
+    abc: '',
     pureProp: '',
-    location:{}
+    location: {}
   },
 
-  ready: function () {
+  ready() {
     // this.store.onChange = function(info){
     //   console.log(info)
     // }

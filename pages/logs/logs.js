@@ -1,4 +1,3 @@
-
 import store from '../../doStore'
 import create from '../../utils/create'
 
@@ -8,7 +7,7 @@ create(store, {
   data: {
     logs: []
   },
-  onLoad: function () {
+  onLoad() {
     this.store.data.logs = (wx.getStorageSync('logs') || []).map(log => {
       return util.formatTime(new Date(log))
     })

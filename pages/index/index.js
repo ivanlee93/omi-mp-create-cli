@@ -36,11 +36,13 @@ create(store, {
     this.update()
   },
 
-  onLoad() {
+  async onLoad() {
 
-    // 测试WXP
+    // 测试WXP , 使用 await 可以优雅的处理的业务逻辑
+    await this.WxpAsyncAwait()
+    // 等待 WxpAsyncAwait 执行完毕后 , 再执行WxpThenCatch
     this.WxpThenCatch()
-    this.WxpAsyncAwait()
+    
 
     if (app.globalData.userInfo) {
       this.update({
@@ -132,7 +134,7 @@ create(store, {
     WXP.request({
       url: config.url.bd
     }).then(resp => {
-      console.log('WxpThenCatchsuccess的返回信息:', resp)
+      console.log('再执行WxpThenCatch:', resp)
     }).catch(errorMesg => {
       console.log('fail信息:', errorMesg)
     })
@@ -142,7 +144,7 @@ create(store, {
       let resp = await WXP.request({
         url: config.url.bd
       })
-      console.log('WxpAsyncAwaitd的返回信息:', resp)
+      console.log('先执行WxpAsyncAwait:', resp)
     } catch (errorMesg) {
       console.log('fail信息:', errorMesg)
     } finally {
