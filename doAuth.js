@@ -1,15 +1,18 @@
 const grantMap = {
   chooseAddress: {
     scope: 'address',
-    name: '通讯地址'
+    name: '通讯地址',
+    autoOpen: true
   },
   saveImageToPhotosAlbum: {
     scope: 'writePhotosAlbum',
-    name: '保存到相册'
+    name: '保存到相册',
+    autoOpen: false
   },
   getLocation:{
     scope:'userLocation',
-    name:'获取当前地理位置'
+    name:'获取当前地理位置',
+    autoOpen: true
   }
 }
 
@@ -105,7 +108,7 @@ module.exports = function(apiName, params) {
         })
       } else {
         // 若用户未授权过，或者已经授权允许了，则直接调 api
-        wx[apiName](params)
+        grant.autoOpen ? wx[apiName](params) : params.success && params.success() // 保存图片失败问题
       }
     }
   })
