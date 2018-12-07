@@ -1,4 +1,4 @@
-import store from '../../doStore'
+import store from '../../store'
 import create from '../../utils/create'
 
 const util = require('../../utils/util.js')

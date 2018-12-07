@@ -1,5 +1,5 @@
 // 工具函数库
-import config from '../config'
+import config from './config'
 
 
 // 时间格式转换

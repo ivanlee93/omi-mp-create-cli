@@ -1,5 +1,5 @@
-import auth from '../../doAuth'
-import store from '../../doStore'
+import auth from '../../utils/auth'
+import store from '../../store'
 import create from '../../utils/create'
 import WXP from '../../utils/wxp'
 import {
