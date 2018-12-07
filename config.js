@@ -1,8 +1,6 @@
-const host = 'http://baidu.com'
+const host = 'https://api.shenjian.io'
 
 module.exports = {
-  url: {
-    bd: `${host}`,
-    test: `${host}/test`
-  }
+  host,
+  test: `${host}/test`
 }

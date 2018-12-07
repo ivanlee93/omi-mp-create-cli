@@ -1,8 +1,10 @@
 import auth from '../../doAuth'
 import store from '../../doStore'
 import create from '../../utils/create'
-import config from '../../config'
 import WXP from '../../utils/wxp'
+import {
+  get
+} from '../../utils/util'
 const {
   regeneratorRuntime
 } = global
@@ -10,7 +12,6 @@ const {
 const app = getApp()
 
 create(store, {
-
   bindViewTap() {
     wx.navigateTo({
       url: '../logs/logs'
@@ -28,21 +29,22 @@ create(store, {
     firstName: null,
     lastName: null,
     pureProp: null,
-    location:{}
+    location: {}
   },
 
   onShow() {
     this.getLocation()
     this.update()
+    this.store.logMotto()
   },
 
   async onLoad() {
-
     // 测试WXP , 使用 await 可以优雅的处理的业务逻辑
-    await this.WxpAsyncAwait()
+    let res1 = await this.WxpAsyncAwait()
+    console.log(res1)
     // 等待 WxpAsyncAwait 执行完毕后 , 再执行WxpThenCatch
-    this.WxpThenCatch()
-    
+    let res2 = await this.WxpThenCatch()
+    console.log(res2)
 
     if (app.globalData.userInfo) {
       this.update({
@@ -50,7 +52,6 @@ create(store, {
         hasUserInfo: true
       })
     } else if (this.data.canIUse) {
-
       app.userInfoReadyCallback = res => {
         this.store.data.userInfo = res.userInfo
         this.store.data.hasUserInfo = true
@@ -76,21 +77,17 @@ create(store, {
           name: '数组项2(将被删除)'
         }
       })
-
     }, 4000)
 
     setTimeout(() => {
-
       this.store.data.b.arr.splice(1, 1)
       this.update()
-
     }, 6000)
 
     setTimeout(() => {
       //测试函数属性
       this.store.data.firstName = 'DNT'
       this.update()
-
     }, 8000)
 
     setTimeout(() => {
@@ -99,7 +96,7 @@ create(store, {
       }
       //测试函数属性
       this.update({
-        firstName: 'lei',
+        firstName: 'lei'
       })
     }, 10000)
 
@@ -120,35 +117,30 @@ create(store, {
     this.update()
   },
   async getLocation(e) {
-    auth('getLocation',{});
+    auth('getLocation', {})
     try {
       let resp = await WXP.getLocation()
-      this.store.data.location = resp;
-      this.update();
+      this.store.data.location = resp
+      this.update()
       console.log(this.store.data.location)
     } catch (errorMesg) {
       console.log('fail信息:', errorMesg)
     }
   },
   WxpThenCatch() {
-    WXP.request({
-      url: config.url.bd
-    }).then(resp => {
-      console.log('再执行WxpThenCatch:', resp)
-    }).catch(errorMesg => {
-      console.log('fail信息:', errorMesg)
+    // 再执行这个
+    let city = '深圳'
+    let url = '/?appid=bb876d15cbe0320032e6150ad36b45ce'
+    return get(url, {
+      city
     })
   },
-  async WxpAsyncAwait() {
-    try {
-      let resp = await WXP.request({
-        url: config.url.bd
-      })
-      console.log('先执行WxpAsyncAwait:', resp)
-    } catch (errorMesg) {
-      console.log('fail信息:', errorMesg)
-    } finally {
-      console.log('complete一定会执行')
-    }
+  WxpAsyncAwait() {
+    // 先执行这个
+    let city = '广州'
+    let url = '/?appid=bb876d15cbe0320032e6150ad36b45ce'
+    return get(url, {
+      city
+    })
   }
 })
