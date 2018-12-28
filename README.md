@@ -10,5 +10,5 @@
 * pages/index/index 路径为中心化（推荐，配合stroe目录提供类vuex的集中数据管理）
 * pages/other/other 路径为去中心化（具体可以查看官方文档）
 #
-omi-mp-create 官方文档：https://github.com/Tencent/omi/edit/master/packages/omi-mp-create
-westore 官方文档：https://github.com/Tencent/westore
+* omi-mp-create 官方文档：https://github.com/Tencent/omi/edit/master/packages/omi-mp-create
+* westore 官方文档：https://github.com/Tencent/westore
