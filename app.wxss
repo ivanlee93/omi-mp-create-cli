@@ -104,7 +104,7 @@ flex-text：按钮文本居中
   -ms-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
   /* 修复IOS执行动画结束或闪一下 */
-  animation-fill-mode:forwards;
+  animation-fill-mode: forwards;
 }
 
 /* 框架布局 */

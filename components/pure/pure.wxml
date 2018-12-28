@@ -1,0 +1,11 @@
+<view class="ctn">
+  <view>
+    <text>Hello Component!{{abc}}</text>
+  </view>
+  <view>
+    <text>【{{pureProp}}】 from Pure Component!</text>
+  </view>
+  <view>
+    <text>{{location.errMsg}}</text>
+  </view>
+</view>

@@ -14,16 +14,7 @@ const actions = {
   ...lyf.actions
 }
 
-// 声明 path 修改相应的data会刷新所有页面和组件，并且不需要声明data依赖
-const globalData = [
-  ...ivanlee.path,
-  ...lyf.path
-]
-
 export default {
   data,
-  ...actions,
-  globalData,
-  updateAll: false
-  //默认 false，为 true 会无脑更新所有实例
+  ...actions
 }

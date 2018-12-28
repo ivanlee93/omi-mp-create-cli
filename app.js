@@ -1,7 +1,7 @@
+//app.js
 import store from './store/index'
 global.regeneratorRuntime = require('./utils/regenerator/runtime-module')
 
-//app.js
 App({
   onLaunch: function () {
     // 展示本地存储能力
@@ -16,12 +16,9 @@ App({
       }
     })
 
-    // setTimeout(function () {
-    //   store.data.motto = '成功在 app.js 进行更新'
-    //   //这里只能用 store.update 而不是 this.update
-    //   store.update()
-    // }, 10000)
-
+    setTimeout(function () {
+      store.data.a = '成功在app.js更新store中的数据'
+    }, 10000)
     // 获取用户信息
     wx.getSetting({
       success: res => {

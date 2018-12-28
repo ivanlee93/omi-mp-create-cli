@@ -11,6 +11,6 @@ create(store, {
       return util.formatTime(new Date(log))
     })
     this.store.data.motto = 'Math.random:' + Math.random()
-    this.update()
+    // this.update()
   }
 })

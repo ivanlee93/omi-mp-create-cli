@@ -1,7 +1,7 @@
 import create from '../../utils/create'
 
 // components/hello/hello.js
-create({
+create.Component({
   /**
    * 组件的属性列表
    */
@@ -13,20 +13,18 @@ create({
    * 组件的初始数据
    */
   data: {
-    abc: '',
-    pureProp: '',
-    location: {}
+    a: {
+      b: Math.random()
+    }
   },
 
-  ready() {
-    // this.store.onChange = function(info){
-    //   console.log(info)
-    // }
-
-    // setTimeout(() => {
-    //   this.store.data.abc = 'efg'
-    //   this.update()
-    // }, 2000)
+  ready: function () {
+    create.emitter.emit('foo', {
+      a: 'b'
+    })
+    setTimeout(() => {
+      this.oData.a.b = 1
+    }, 3000)
   },
   /**
    * 组件的方法列表

@@ -10,18 +10,14 @@ const actions = {
     // console.log(store)
     return get(Api.test, payload).then(res => {
       this.data.motto = res.reason
-      console.log(res.data)
+      console.log(res)
       return res
     })
   }
 }
 
-// 声明 path 修改相应的data会刷新所有页面和组件，并且不需要声明data依赖
-const path = []
-
 export default {
   data,
-  path,
   actions
 }
 

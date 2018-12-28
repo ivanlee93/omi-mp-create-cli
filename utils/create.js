@@ -1,412 +1,156 @@
-import diff from './diff'
+/*!
+ *  omi-mp-create v0.1.0 by dntzhang
+ *  Github: https://github.com/Tencent/omi
+ *  MIT Licensed.
+*/
 
-let originData = null
+import obaa from './obaa'
+import mitt from './mitt'
+
+function _Page(option) {
+  const onLoad = option.onLoad
+  option.onLoad = function (e) {
+    this.store = option.store
+    this.oData = JSON.parse(JSON.stringify(option.data))
+    observe(this)
+    onLoad && onLoad.call(this, e)
+  }
+  Page(option)
+}
+
+function _Component(option) {
+  const ready = option.ready
+  option.ready = function () {
+    const page = getCurrentPages()[getCurrentPages().length - 1]
+    this.store = option.store || page.store
+    this.oData = JSON.parse(JSON.stringify(option.data))
+    observe(this)
+    ready && ready.call(this)
+  }
+  Component(option)
+}
+
+function fixPath(path) {
+  let mpPath = ''
+  const arr = path.replace('#-', '').split('-')
+  arr.forEach((item, index) => {
+    if (index) {
+      if (isNaN(parseInt(item))) {
+        mpPath += '.' + item
+      } else {
+        mpPath += '[' + item + ']'
+      }
+    } else {
+      mpPath += item
+    }
+  })
+  return mpPath
+}
+
+function observe(ele) {
+  let timeout = null
+  let patch = {}
+  obaa(ele.oData, (prop, value, old, path) => {
+    clearTimeout(timeout)
+    if (prop.indexOf('Array-push') === 0) {
+      let dl = value.length - old.length
+      for (let i = 0; i < dl; i++) {
+        patch[fixPath(path + '-' + (old.length + i))] = value[(old.length + i)]
+      }
+    } else if (prop.indexOf('Array-') === 0) {
+      patch[fixPath(path)] = value
+    } else {
+      patch[fixPath(path + '-' + prop)] = value
+    }
+
+    timeout = setTimeout(() => {
+      ele.setData(patch)
+      patch = {}
+    }, 0)
+  })
+}
+
+
 let globalStore = null
-let fnMapping = {}
 
-const ARRAYTYPE = '[object Array]'
-const OBJECTTYPE = '[object Object]'
-const FUNCTIONTYPE = '[object Function]'
+function create(store, option) {
+  if (arguments.length === 2) {
+    if (option.data && Object.keys(option.data).length > 0) {
+      Object.assign(store.data, JSON.parse(JSON.stringify(option.data)))
+    }
+    if (!store.instances) {
+      store.instances = {}
+    }
 
-export default function create(store, option) {
-    let updatePath = null
-    if (arguments.length === 2) {   
-        if (option.data && Object.keys(option.data).length > 0) {
-            updatePath = getUpdatePath(option.data)
-            syncValues(store.data, option.data)
-        }
-        if (!originData) {
-            originData = JSON.parse(JSON.stringify(store.data))
-            globalStore = store
-            store.instances = {}
-            store.update = update
-            store.push = push
-            store.pull = pull
-            store.add = add
-            store.remove = remove
-            store.originData = originData
-            store.env && initCloud(store.env)
-            extendStoreMethod(store)
-        }
-        getApp().globalData && (getApp().globalData.store = store)
-        option.data = store.data
-        const onLoad = option.onLoad
-        walk(store.data)
-        option.onLoad = function (e) {
-            this.store = store
-            this._updatePath = updatePath
-            rewriteUpdate(this)
-            store.instances[this.route] = []
-            store.instances[this.route].push(this)
-            onLoad && onLoad.call(this, e)
-        }
-        Page(option)
+    getApp().globalData && (getApp().globalData.store = store)
+    globalStore = store
+    option.data = store.data
+    observeStore(store)
+    const onLoad = option.onLoad
+
+    option.onLoad = function (e) {
+      this.store = store
+
+      store.instances[this.route] = []
+      store.instances[this.route].push(this)
+      onLoad && onLoad.call(this, e)
+    }
+    Page(option)
+  } else {
+    const ready = store.ready
+    store.ready = function () {
+      this.page = getCurrentPages()[getCurrentPages().length - 1]
+      this.store = this.page.store
+      store.data && Object.assign(this.store.data, JSON.parse(JSON.stringify(store.data)))
+
+      this.setData.call(this, this.store.data)
+
+      this.store.instances[this.page.route].push(this)
+      ready && ready.call(this)
+    }
+    Component(store)
+  }
+}
+
+
+function observeStore(store) {
+  let timeout = null
+  let patch = {}
+  obaa(store.data, (prop, value, old, path) => {
+    clearTimeout(timeout)
+    if (prop.indexOf('Array-push') === 0) {
+      let dl = value.length - old.length
+      for (let i = 0; i < dl; i++) {
+        patch[fixPath(path + '-' + (old.length + i))] = value[(old.length + i)]
+      }
+    } else if (prop.indexOf('Array-') === 0) {
+      patch[fixPath(path)] = value
     } else {
-        const ready = store.ready
-        const pure = store.pure
-        store.ready = function () {
-            if (pure) {
-                this.store = { data: store.data || {} }
-                this.store.originData = store.data ? JSON.parse(JSON.stringify(store.data)) : {}
-                walk(store.data || {})
-                rewritePureUpdate(this)
-            } else {
-                this.page = getCurrentPages()[getCurrentPages().length - 1]
-                this.store = this.page.store
-                this._updatePath = getUpdatePath(store.data)
-                syncValues(this.store.data, store.data)
-                walk(store.data || {})
-                this.setData.call(this, this.store.data)
-                rewriteUpdate(this)
-                this.store.instances[this.page.route].push(this)
-            }
-            ready && ready.call(this)
-        }
-        Component(store)
+      patch[fixPath(path + '-' + prop)] = value
     }
+
+    timeout = setTimeout(() => {
+      _update(patch)
+      patch = {}
+    }, 0)
+  })
 }
 
-function syncValues(from, to){
-    Object.keys(to).forEach(key=>{
-        to[key] = from[key]
+function _update(kv) {
+  for (let key in globalStore.instances) {
+    globalStore.instances[key].forEach(ins => {
+      ins.setData.call(ins, kv)
     })
+  }
+  globalStore.onChange && globalStore.onChange(kv)
 }
 
 
-function getUpdatePath(data) {
-	const result = {}
-    dataToPath(data, result)
-	return result
-}
+create.Page = _Page
+create.Component = _Component
+create.obaa = obaa
+create.mitt = mitt
+create.emitter = mitt()
 
-function dataToPath(data, result) {
-	Object.keys(data).forEach(key => {
-		result[key] = true
-		const type = Object.prototype.toString.call(data[key])
-		if (type === OBJECTTYPE) {
-			_objToPath(data[key], key, result)
-		} else if (type === ARRAYTYPE) {
-			_arrayToPath(data[key], key, result)
-		}
-	})
-}
 
-function _objToPath(data, path, result) {
-	Object.keys(data).forEach(key => {
-		result[path + '.' + key] = true
-		delete result[path]
-		const type = Object.prototype.toString.call(data[key])
-		if (type === OBJECTTYPE) {
-			_objToPath(data[key], path + '.' + key, result)
-		} else if (type === ARRAYTYPE) {
-			_arrayToPath(data[key], path + '.' + key, result)
-		}
-	})
-}
-
-function _arrayToPath(data, path, result) {
-	data.forEach((item, index) => {
-		result[path + '[' + index + ']'] = true
-		delete result[path]
-		const type = Object.prototype.toString.call(item)
-		if (type === OBJECTTYPE) {
-			_objToPath(item, path + '[' + index + ']', result)
-		} else if (type === ARRAYTYPE) {
-			_arrayToPath(item, path + '[' + index + ']', result)
-		}
-	})
-}
-
-function rewritePureUpdate(ctx) {
-    ctx.update = function (patch) {
-        const store = this.store
-        //defineFnProp(store.data)
-        if (patch) {
-            for (let key in patch) {
-                updateByPath(store.data, key, patch[key])
-            }
-        }
-        let diffResult = diff(store.data, store.originData)
-        if (Object.keys(diffResult)[0] == '') {
-            diffResult = diffResult['']
-        }
-        if (Object.keys(diffResult).length > 0) {
-            this.setData(diffResult)
-            store.onChange && store.onChange(diffResult)
-            for (let key in diffResult) {
-                updateByPath(store.originData, key, typeof diffResult[key] === 'object' ? JSON.parse(JSON.stringify(diffResult[key])) : diffResult[key])
-            }
-        }
-        return diffResult
-    }
-}
-
-function initCloud(env) {
-    wx.cloud.init()
-    globalStore.db = wx.cloud.database({
-        env: env
-    })
-}
-
-function push(patch) {
-    return new Promise(function (resolve, reject) {
-        _push(update(patch), resolve, reject)
-    })
-}
-
-function _push(diffResult, resolve) {
-    const objs = diffToPushObj(diffResult)
-    Object.keys(objs).forEach((path) => {
-        const arr = path.split('-')
-        const id = globalStore.data[arr[0]][parseInt(arr[1])]._id
-        const obj = objs[path]
-        if (globalStore.methods && globalStore.methods[arr[0]]) {
-            Object.keys(globalStore.methods[arr[0]]).forEach(key => {
-                if (obj.hasOwnProperty(key)) {
-                    delete obj[key]
-                }
-            })
-        }
-        globalStore.db.collection(arr[0]).doc(id).update({
-            data: obj
-        }).then((res) => {
-            resolve(res)
-        })
-    })
-}
-
-function update(patch) {
-    //defineFnProp(globalStore.data)
-    if (patch) {
-        for (let key in patch) {
-            updateByPath(globalStore.data, key, patch[key])
-        }
-    }
-    let diffResult = diff(globalStore.data, originData)
-    if (Object.keys(diffResult)[0] == '') {
-        diffResult = diffResult['']
-    }
-    const updateAll = matchGlobalData(diffResult)
-    if (Object.keys(diffResult).length > 0) {
-        for (let key in globalStore.instances) {
-            globalStore.instances[key].forEach(ins => {
-                if(updateAll || globalStore.updateAll || ins._updatePath && needUpdate(diffResult, ins._updatePath)){
-                    ins.setData.call(ins, diffResult)
-                }
-            })
-        }
-        globalStore.onChange && globalStore.onChange(diffResult)
-        for (let key in diffResult) {
-            updateByPath(originData, key, typeof diffResult[key] === 'object' ? JSON.parse(JSON.stringify(diffResult[key])) : diffResult[key])
-        }
-    }
-    return diffResult
-}
-
-function matchGlobalData(diffResult) {
-    if(!globalStore.globalData) return false
-    for (let keyA in diffResult) {
-        if (globalStore.globalData.indexOf(keyA) > -1) {
-            return true
-        }
-        for (let i = 0, len = globalStore.globalData.length; i < len; i++) {
-            if (includePath(keyA, globalStore.globalData[i])) {
-                return true
-            }
-        }
-    }
-    return false
-}
-
-function needUpdate(diffResult, updatePath){
-    for(let keyA in diffResult){
-        if(updatePath[keyA]){
-            return true
-        }
-        for(let keyB in updatePath){
-            if(includePath(keyA, keyB)){
-                return true
-            }
-        }
-    }
-    return false
-}
-
-function includePath(pathA, pathB){
-    if(pathA.indexOf(pathB)===0){
-        const next = pathA.substr(pathB.length, 1)
-        if(next === '['||next === '.'){
-            return true
-        }
-    }
-    return false
-}
-
-function rewriteUpdate(ctx) {
-    ctx.update = update
-}
-
-function updateByPath(origin, path, value) {
-    const arr = path.replace(/]/g, '').replace(/\[/g, '.').split('.')
-    let current = origin
-    for (let i = 0, len = arr.length; i < len; i++) {
-        if (i === len - 1) {
-            current[arr[i]] = value
-        } else {
-            current = current[arr[i]]
-        }
-    }
-}
-
-function pull(cn, where) {
-    return new Promise(function (resolve) {
-        globalStore.db.collection(cn).where(where || {}).get().then(res => {
-            extend(res, cn)
-            resolve(res)
-        })
-    })
-}
-
-function extend(res, cn) {
-    res.data.forEach(item => {
-        const mds = globalStore.methods[cn]
-        mds && Object.keys(mds).forEach(key => {
-            Object.defineProperty(item, key, {
-                enumerable: true,
-                get: () => {
-                    return mds[key].call(item)
-                },
-                set: () => {
-                    //方法不能改写
-                }
-            })
-        })
-    })
-}
-
-function add(cn, data) {
-    return globalStore.db.collection(cn).add({ data })
-}
-
-function remove(cn, id) {
-    return globalStore.db.collection(cn).doc(id).remove()
-}
-
-function diffToPushObj(diffResult) {
-    const result = {}
-    Object.keys(diffResult).forEach(key => {
-        diffItemToObj(key, diffResult[key], result)
-    })
-    return result
-}
-
-function diffItemToObj(path, value, result) {
-    const arr = path.replace(/]/g, '').replace(/\[/g, '.').split('.')
-    const obj = {}
-    let current = null
-    const len = arr.length
-    for (let i = 2; i < len; i++) {
-        if (len === 3) {
-            obj[arr[i]] = value
-        } else {
-            if (i === len - 1) {
-                current[arr[i]] = value
-            } else {
-                const pre = current
-                current = {}
-                if (i === 2) {
-                    obj[arr[i]] = current
-                } else {
-                    pre[arr[i]] = current
-                }
-            }
-        }
-    }
-    const key = arr[0] + '-' + arr[1]
-    result[key] = Object.assign(result[key] || {}, obj)
-}
-
-function extendStoreMethod() {
-    globalStore.method = function (path, fn) {
-        fnMapping[path] = fn
-        let ok = getObjByPath(path)
-        Object.defineProperty(ok.obj, ok.key, {
-            enumerable: true,
-            get: () => {
-                return fnMapping[path].call(globalStore.data)
-            },
-            set: () => {
-                console.warn('Please using store.method to set method prop of data!')
-            }
-        })
-    }
-}
-
-function getObjByPath(path) {
-    const arr = path.replace(/]/g, '').replace(/\[/g, '.').split('.')
-    const len = arr.length
-    if (len > 1) {
-        let current = globalStore.data[arr[0]]
-        for (let i = 1; i < len - 1; i++) {
-            current = current[arr[i]]
-        }
-        return { obj: current, key: arr[len - 1] }
-    } else {
-        return { obj: globalStore.data, key: arr[0] }
-    }
-}
-
-function walk(data) {
-    Object.keys(data).forEach(key => {
-        const obj = data[key]
-        const tp = type(obj)
-        if (tp == FUNCTIONTYPE) {
-            setProp(key, obj)
-        } else if (tp == OBJECTTYPE) {
-            Object.keys(obj).forEach(subKey => {
-                _walk(obj[subKey], key + '.' + subKey)
-            })
-
-        } else if (tp == ARRAYTYPE) {
-            obj.forEach((item, index) => {
-                _walk(item, key + '[' + index + ']')
-            })
-
-        }
-    })
-}
-
-function _walk(obj, path) {
-    const tp = type(obj)
-    if (tp == FUNCTIONTYPE) {
-        setProp(path, obj)
-    } else if (tp == OBJECTTYPE) {
-        Object.keys(obj).forEach(subKey => {
-            _walk(obj[subKey], path + '.' + subKey)
-        })
-
-    } else if (tp == ARRAYTYPE) {
-        obj.forEach((item, index) => {
-            _walk(item, path + '[' + index + ']')
-        })
-
-    }
-}
-
-function setProp(path, fn) {
-    const ok = getObjByPath(path)
-    fnMapping[path] = fn
-    Object.defineProperty(ok.obj, ok.key, {
-        enumerable: true,
-        get: () => {
-            return fnMapping[path].call(globalStore.data)
-        },
-        set: () => {
-            console.warn('Please using store.method to set method prop of data!')
-        }
-    })
-}
-
-function type(obj) {
-    return Object.prototype.toString.call(obj)
-}
+export default create
