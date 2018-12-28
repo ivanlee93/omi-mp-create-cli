@@ -1,5 +1,4 @@
-import store from './store'
-
+import store from './store/index'
 global.regeneratorRuntime = require('./utils/regenerator/runtime-module')
 
 //app.js
@@ -17,11 +16,11 @@ App({
       }
     })
 
-    setTimeout(function () {
-      store.data.motto = '成功在 app.js 进行更新'
-      //这里只能用 store.update 而不是 this.update
-      store.update()
-    }, 10000)
+    // setTimeout(function () {
+    //   store.data.motto = '成功在 app.js 进行更新'
+    //   //这里只能用 store.update 而不是 this.update
+    //   store.update()
+    // }, 10000)
 
     // 获取用户信息
     wx.getSetting({

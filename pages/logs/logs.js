@@ -1,6 +1,5 @@
-import store from '../../store'
+import store from '../../store/index'
 import create from '../../utils/create'
-
 const util = require('../../utils/util.js')
 
 create(store, {

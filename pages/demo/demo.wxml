@@ -1,0 +1,4 @@
+<!-- pages/demo/demo.wxml -->
+<text>pages/demo/demo.wxml</text>
+<view>{{motto}}</view>
+<view>{{a}}</view>

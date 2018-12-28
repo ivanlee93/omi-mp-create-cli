@@ -25,7 +25,8 @@ function request(url, method, data) {
     wx.request({
       data,
       method,
-      url: config.host + url,
+      url,
+      // url: config.host + url,
       success: function (res) {
         if (res.data.error === 'ok') {
           resolve(res.data.data)

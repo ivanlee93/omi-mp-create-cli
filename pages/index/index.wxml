@@ -6,7 +6,7 @@
     </button>
     <block wx:else>
       <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-      <text class="userinfo-nickname">Index Page</text>
+      <text class="userinfo-nickname" bindtap="bindViewDemo">点我进入demo请求页</text>
     </block>
   </view>
   <view class="usermotto">
@@ -15,7 +15,7 @@
   <view class="usermotto">
     <text class="user-motto">{{b.fnTest}}</text>
   </view>
-  <view wx:for="{{b.arr}}" wx:for-item="item">
+  <view wx:for="{{b.arr}}" wx:for-item="item" wx:key="index">
     <text class="log-item">{{index + 1}}. {{item.name}}</text>
   </view>
   <view>FullName: {{fullName}}</view>

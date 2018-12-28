@@ -1,10 +1,7 @@
 import auth from '../../utils/auth'
-import store from '../../store'
+import store from '../../store/index'
 import create from '../../utils/create'
 import WXP from '../../utils/wxp'
-import {
-  get
-} from '../../utils/util'
 const {
   regeneratorRuntime
 } = global
@@ -12,11 +9,6 @@ const {
 const app = getApp()
 
 create(store, {
-  bindViewTap() {
-    wx.navigateTo({
-      url: '../logs/logs'
-    })
-  },
 
   data: {
     motto: null,
@@ -32,6 +24,18 @@ create(store, {
     location: {}
   },
 
+  bindViewTap() {
+    wx.navigateTo({
+      url: '../logs/logs'
+    })
+  },
+
+  bindViewDemo() {
+    wx.navigateTo({
+      url: '../demo/demo'
+    })
+  },
+
   onShow() {
     this.getLocation()
     this.update()
@@ -39,12 +43,6 @@ create(store, {
   },
 
   async onLoad() {
-    // 测试WXP , 使用 await 可以优雅的处理的业务逻辑
-    let res1 = await this.WxpAsyncAwait()
-    console.log(res1)
-    // 等待 WxpAsyncAwait 执行完毕后 , 再执行WxpThenCatch
-    let res2 = await this.WxpThenCatch()
-    console.log(res2)
 
     if (app.globalData.userInfo) {
       this.update({
@@ -127,20 +125,4 @@ create(store, {
       console.log('fail信息:', errorMesg)
     }
   },
-  WxpThenCatch() {
-    // 再执行这个
-    let city = '深圳'
-    let url = '/?appid=bb876d15cbe0320032e6150ad36b45ce'
-    return get(url, {
-      city
-    })
-  },
-  WxpAsyncAwait() {
-    // 先执行这个
-    let city = '广州'
-    let url = '/?appid=bb876d15cbe0320032e6150ad36b45ce'
-    return get(url, {
-      city
-    })
-  }
 })
