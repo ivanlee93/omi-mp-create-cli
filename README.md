@@ -2,7 +2,7 @@
 * 极小却精巧的小程序框架，对小程序入侵性几乎为零，强制中心化或者强制去中心化都是耍流氓
 * 创建store目录，提供类似vuex集中数据管理的开发体验，多人协作开发划分模块代码互不影响
 * 数据变更之后不需要再setData，会在View层自动实现最短路径进行渲染，性能上一个档次。（中心化）
-* 添加了regeneratorRuntime，可在原生中直接用async await，wxp封装小程序所有Api
+* 添加了regeneratorRuntime，wxp封装小程序所有Api，可在原生中直接用async await语法糖
 * 使用promise封装了原生get，post请求，支持async await then语法糖，配合store，开发体验更愉悦
 #
 * 项目中包含强制中心化和强制去中心化开发方案
