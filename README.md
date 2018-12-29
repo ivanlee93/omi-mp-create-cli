@@ -6,7 +6,7 @@
 * 添加了regeneratorRuntime，wxp封装小程序所有Api，可在原生中直接用async await语法糖
 * 使用promise封装了原生get，post请求，支持async await then语法糖，配合store，开发体验更愉悦
 #
-* 项目中包含中心化和去中心化开发方案
+* 项目中包含中心化和去中心化demo方案
 * pages/index/index 路径为中心化（推荐，配合stroe目录提供类vuex的集中数据管理）
 * pages/other/other 路径为去中心化（具体可以查看官方文档）
 #
