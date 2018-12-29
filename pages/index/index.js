@@ -1,83 +1,77 @@
-import auth from '../../utils/auth'
-import store from '../../store/index'
+// pages/index/index.js
+// 这是初始模板，演示的代码写在首页在indexs中
 import create from '../../utils/create'
+import store from '../../store/index'
+import auth from '../../utils/auth'
 import WXP from '../../utils/wxp'
 const {
   regeneratorRuntime
 } = global
-
 const app = getApp()
 
 create(store, {
-  bindViewTap() {
-    wx.navigateTo({
-      url: '../logs/logs'
-    })
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    c: '2'
   },
 
-  bindViewDemo() {
-    wx.navigateTo({
-      url: '../demo/demo'
-    })
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad(options) {
+    console.log(this.data) // 这里是页面私有数据
+    console.log(this.store.data) //这是全局数据
   },
 
+  /**
+   * 生命周期函数--监听页面初次渲染完成
+   */
+  onReady() {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面显示
+   */
   onShow() {
-    this.getLocation()
-    this.store.logMotto()
+
   },
 
-  async onLoad() {
-    if (app.globalData.userInfo) {
-      this.store.data.userInfo = app.globalData.userInfo,
-        this.store.data.hasUserInfo = true
-    } else if (this.data.canIUse) {
-      app.userInfoReadyCallback = res => {
-        this.store.data.userInfo = res.userInfo
-        this.store.data.hasUserInfo = true
-      }
-    } else {
-      wx.getUserInfo({
-        success: res => {
-          app.globalData.userInfo = res.userInfo
-          this.store.data.userInfo = res.userInfo
-          this.store.data.hasUserInfo = true
-        }
-      })
-    }
+  /**
+   * 生命周期函数--监听页面隐藏
+   */
+  onHide() {
 
-    setTimeout(() => {
-      this.store.data.motto = 'Hello Westore'
-      this.store.data.b.arr[0].name = '测试'
-      this.store.data.b.arr.splice(this.store.data.b.arr.length, 1, {
-        name: '数组项2(将被删除)'
-      })
-    }, 4000)
-
-    setTimeout(() => {
-      this.store.data.b.arr.splice(1, 1)
-    }, 6000)
-
-    setTimeout(() => {
-      this.store.data.pureProp = '成功修改 Pure Component prop'
-    }, 12000)
   },
 
-  getUserInfo(e) {
-    app.globalData.userInfo = e.detail.userInfo
-    this.store.data.userInfo = e.detail.userInfo
-    this.store.data.hasUserInfo = true
+  /**
+   * 生命周期函数--监听页面卸载
+   */
+  onUnload() {
+
   },
-  onRandom(evt) {
-    this.store.data.pureProp = evt.detail.rd
+
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
+  onPullDownRefresh() {
+
   },
-  async getLocation(e) {
-    auth('getLocation', {})
-    try {
-      let resp = await WXP.getLocation()
-      this.store.data.location = resp
-      console.log(this.store.data.location.latitude + ' ' + this.store.data.location.longitude)
-    } catch (errorMesg) {
-      console.log('fail信息:', errorMesg)
-    }
+
+  /**
+   * 页面上拉触底事件的处理函数
+   */
+  onReachBottom() {
+
   },
+
+  /**
+   * 用户点击右上角分享
+   */
+  onShareAppMessage() {
+
+  }
 })

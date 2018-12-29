@@ -16,5 +16,5 @@ const actions = {
 
 export default {
   data,
-  ...actions
+  ...actions,
 }

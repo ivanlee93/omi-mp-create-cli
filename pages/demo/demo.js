@@ -15,7 +15,7 @@ create(store, {
     console.log(this)
     // 集中数据管理的好处是把所有请求统一放到store中，需要用时，直接调用即可
     let city = '深圳'
-    await this.store.FUN({
+    await this.store["LYF/ADD"]({
       city
     })
     this.store.data.a = 'ok'

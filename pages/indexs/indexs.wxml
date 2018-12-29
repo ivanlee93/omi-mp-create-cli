@@ -1,0 +1,28 @@
+<!-- index.wxml -->
+<view class="ctn">
+  <view class="userinfo">
+    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo">
+      获取头像昵称
+    </button>
+    <block wx:else>
+      <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+      <text class="userinfo-nickname" bindtap="bindViewDemo">点我进入demo请求页</text>
+    </block>
+  </view>
+  <view class="usermotto">
+    <text class="user-motto">{{motto}}</text>
+  </view>
+  <view class="usermotto">
+    <text class="user-motto">{{a}}</text>
+  </view>
+  <view wx:for="{{b.arr}}" wx:for-item="item" wx:key="index">
+    <text class="log-item">{{index + 1}}. {{item.name}}</text>
+  </view>
+  <pure></pure>
+  <test-pure-component bind:random="onRandom" pureProp="{{pureProp}}"></test-pure-component>
+</view>
+<view class="flex flex-v flex-align-center">
+  <button size="mini" bindtap="getLocation">点击获取位置授权(示例)</button>
+  <view>{{location.errMsg}}</view>
+  <view bindtap="bindViewindex">{{globalPropTest}}</view>
+</view>

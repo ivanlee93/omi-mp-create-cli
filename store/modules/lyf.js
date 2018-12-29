@@ -6,7 +6,7 @@ const data = {
 // 集中处理所有请求（包含异步和同步）
 const actions = {
   // 测试demo
-  FUN(payload) {
+  ["LYF/ADD"](payload) {
     // console.log(store)
     return get(Api.test, payload).then(res => {
       this.data.motto = res.reason

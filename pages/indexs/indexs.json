@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "首页",
+  "usingComponents": {
+    "pure": "/components/pure/pure",
+    "test-pure-component": "/components/test-pure-component/test-pure-component"
+  }
+}
