@@ -18,6 +18,10 @@ create(store, {
     c: '2'
   },
 
+  clikc() {
+    console.log(this)
+  },
+
   /**
    * 生命周期函数--监听页面加载
    */

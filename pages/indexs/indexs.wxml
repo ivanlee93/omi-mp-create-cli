@@ -13,7 +13,7 @@
     <text class="user-motto">{{motto}}</text>
   </view>
   <view class="usermotto">
-    <text class="user-motto">{{a}}</text>
+    <text class="user-motto">{{lyf.a}}</text>
   </view>
   <view wx:for="{{b.arr}}" wx:for-item="item" wx:key="index">
     <text class="log-item">{{index + 1}}. {{item.name}}</text>

@@ -18,7 +18,7 @@ create(store, {
     await this.store["LYF/ADD"]({
       city
     })
-    this.store.data.a = 'ok'
+    this.store.data.lyf.a = 'ok'
   },
 
   /**

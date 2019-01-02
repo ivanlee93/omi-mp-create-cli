@@ -17,7 +17,7 @@ App({
     })
 
     setTimeout(function () {
-      store.data.a = '成功在app.js更新store中的数据'
+      store.data.lyf.a = '成功在app.js更新store中的数据'
     }, 10000)
     // 获取用户信息
     wx.getSetting({
